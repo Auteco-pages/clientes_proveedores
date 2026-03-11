@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auteco · Creación de clientes y proveedores · Dashboard Ejecutivo</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #f0f2f8;
+  --surface:  #ffffff;
+  --card:     #ffffff;
+  --sidebar:  #1e2a4a;
+  --border:   #e2e6f0;
+  --accent:   #3a56e8;
+  --accent2:  #00b899;
+  --accent3:  #ff6b6b;
+  --green:    #1cb87e;
+  --red:      #e84343;
+  --yellow:   #f5a623;
+  --purple:   #7c5cbf;
+  --blue-lt:  #eef1fd;
+  --teal-lt:  #e6faf7;
+  --red-lt:   #fdf0f0;
+  --yellow-lt:#fff8ec;
+  --purple-lt:#f3eeff;
+  --text:     #1a2035;
+  --text2:    #4a5270;
+  --muted:    #8b93b0;
+  --shadow:   0 2px 12px rgba(30,42,74,0.08);
+  --shadow-md:0 4px 24px rgba(30,42,74,0.12);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+/* ── LAYOUT ── */
+.layout { display:flex; min-height:100vh; }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: 220px; flex-shrink:0;
+  background: var(--sidebar);
+  padding: 0;
+  display: flex; flex-direction:column;
+  position: sticky; top:0; height:100vh;
+}
+.sidebar-logo {
+  padding: 22px 20px 18px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  display:flex; align-items:center; gap:12px;
+}
+.logo-box {
+  width:38px; height:38px; border-radius:10px;
+  background: linear-gradient(135deg,#3a56e8,#00b899);
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Syne',sans-serif; font-weight:800; font-size:16px; color:#fff;
+  flex-shrink:0;
+}
+.logo-text { font-family:'Syne',sans-serif; font-size:15px; font-weight:700; color:#fff; line-height:1.2; }
+.logo-sub  { font-size:10px; color:rgba(255,255,255,0.4); }
+
+.sidebar-section { padding:20px 16px 8px; font-size:10px; color:rgba(255,255,255,0.3); text-transform:uppercase; letter-spacing:1.5px; }
+.nav-item {
+  display:flex; align-items:center; gap:10px;
+  padding:10px 16px; margin:2px 8px;
+  border-radius:8px; font-size:13px; color:rgba(255,255,255,0.6);
+  cursor:pointer; transition:.15s;
+}
+.nav-item:hover { background:rgba(255,255,255,0.06); color:#fff; }
+.nav-item.active { background:rgba(58,86,232,0.3); color:#fff; font-weight:600; }
+.nav-icon { font-size:15px; flex-shrink:0; }
+
+.sidebar-footer {
+  margin-top:auto; padding:16px;
+  border-top:1px solid rgba(255,255,255,0.08);
+  font-size:11px; color:rgba(255,255,255,0.3);
+  text-align:center; line-height:1.5;
+}
+
+/* ── MAIN ── */
+.main { flex:1; overflow:hidden; }
+
+/* ── TOP HEADER ── */
+.topbar {
+  background: var(--surface);
+  border-bottom:1px solid var(--border);
+  padding:14px 28px;
+  display:flex; align-items:center; justify-content:space-between;
+  box-shadow: 0 1px 6px rgba(30,42,74,0.05);
+  position:sticky; top:0; z-index:100;
+}
+.page-title { font-family:'Syne',sans-serif; font-size:16px; font-weight:700; }
+.page-sub   { font-size:12px; color:var(--muted); margin-top:1px; }
+.topbar-right { display:flex; align-items:center; gap:14px; }
+.badge-date {
+  background:var(--blue-lt); color:var(--accent);
+  font-size:12px; font-weight:600;
+  padding:5px 12px; border-radius:20px;
+  border:1px solid rgba(58,86,232,0.15);
+}
+.live-chip {
+  display:flex; align-items:center; gap:5px;
+  font-size:11px; color:var(--green); font-weight:600;
+}
+.live-chip .dot { width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite; }
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.4)}}
+
+/* ── CONTENT ── */
+.content { padding:24px 28px; }
+
+/* ── FILTERS ── */
+.filters-panel {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:16px 20px;
+  margin-bottom:22px;
+  box-shadow: var(--shadow);
+  display:flex; align-items:center; gap:20px; flex-wrap:wrap;
+}
+.filter-group { display:flex; align-items:center; gap:7px; }
+.filter-label { font-size:11px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.8px; }
+.filter-select {
+  background:#f5f7fc;
+  border:1px solid var(--border);
+  color:var(--text);
+  font-family:'DM Sans',sans-serif; font-size:13px; font-weight:500;
+  padding:7px 30px 7px 11px;
+  border-radius:8px; cursor:pointer;
+  appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%238b93b0'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 10px center;
+  transition:.15s;
+}
+.filter-select:hover, .filter-select:focus { border-color:var(--accent); outline:none; background-color:#fff; }
+.divider { width:1px; height:28px; background:var(--border); }
+.btn-reset {
+  margin-left:auto;
+  background:#fff; border:1px solid var(--border);
+  color:var(--text2); font-family:'DM Sans',sans-serif; font-size:12px; font-weight:600;
+  padding:7px 14px; border-radius:8px; cursor:pointer;
+  transition:.15s; display:flex; align-items:center; gap:5px;
+}
+.btn-reset:hover { border-color:var(--accent); color:var(--accent); }
+
+/* ── SECTION LABEL ── */
+.sec-label {
+  font-family:'Syne',sans-serif; font-size:11px; font-weight:700;
+  color:var(--muted); text-transform:uppercase; letter-spacing:1.5px;
+  margin:0 0 14px; display:flex; align-items:center; gap:8px;
+}
+.sec-label::after { content:''; flex:1; height:1px; background:var(--border); }
+
+/* ── KPI GRID ── */
+.kpi-grid {
+  display:grid;
+  grid-template-columns: repeat(6,1fr);
+  gap:14px; margin-bottom:22px;
+}
+.kpi-card {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:18px 16px;
+  box-shadow:var(--shadow);
+  position:relative; overflow:hidden;
+  transition:transform .18s,box-shadow .18s;
+  cursor:default;
+}
+.kpi-card:hover { transform:translateY(-2px); box-shadow:var(--shadow-md); }
+.kpi-card::after {
+  content:''; position:absolute; bottom:0; left:0; right:0; height:3px;
+  border-radius:0 0 14px 14px;
+}
+.kpi-blue::after   { background:linear-gradient(90deg,#3a56e8,#7b93ff); }
+.kpi-teal::after   { background:linear-gradient(90deg,#00b899,#00e5c0); }
+.kpi-green::after  { background:linear-gradient(90deg,#1cb87e,#5ad9a8); }
+.kpi-red::after    { background:linear-gradient(90deg,#e84343,#ff8080); }
+.kpi-yellow::after { background:linear-gradient(90deg,#f5a623,#ffd166); }
+.kpi-purple::after { background:linear-gradient(90deg,#7c5cbf,#b57bee); }
+
+.kpi-icon-wrap {
+  width:36px; height:36px; border-radius:10px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:16px; margin-bottom:10px;
+}
+.kpi-blue   .kpi-icon-wrap { background:var(--blue-lt); }
+.kpi-teal   .kpi-icon-wrap { background:var(--teal-lt); }
+.kpi-green  .kpi-icon-wrap { background:#e7f9f2; }
+.kpi-red    .kpi-icon-wrap { background:var(--red-lt); }
+.kpi-yellow .kpi-icon-wrap { background:var(--yellow-lt); }
+.kpi-purple .kpi-icon-wrap { background:var(--purple-lt); }
+
+.kpi-lbl  { font-size:11px; color:var(--muted); font-weight:500; margin-bottom:4px; }
+.kpi-val  { font-family:'Syne',sans-serif; font-size:26px; font-weight:800; line-height:1; }
+.kpi-blue   .kpi-val { color:var(--accent); }
+.kpi-teal   .kpi-val { color:var(--accent2); }
+.kpi-green  .kpi-val { color:var(--green); }
+.kpi-red    .kpi-val { color:var(--red); }
+.kpi-yellow .kpi-val { color:var(--yellow); }
+.kpi-purple .kpi-val { color:var(--purple); }
+
+.kpi-badge {
+  display:inline-block; margin-top:7px;
+  font-size:10px; font-weight:700; padding:2px 8px; border-radius:10px;
+}
+.b-up  { background:#e7f9f2; color:var(--green); }
+.b-dn  { background:var(--red-lt); color:var(--red); }
+.b-war { background:var(--yellow-lt); color:var(--yellow); }
+.b-neu { background:var(--blue-lt); color:var(--accent); }
+
+/* ── COMPARISON BANNER ── */
+.cmp-banner {
+  background:linear-gradient(135deg,#e7f9f2,#eef1fd);
+  border:1px solid rgba(28,184,126,0.2);
+  border-radius:14px;
+  padding:16px 24px;
+  margin-bottom:22px;
+  display:flex; align-items:center; gap:24px; flex-wrap:wrap;
+  box-shadow:var(--shadow);
+}
+.cmp-title { font-family:'Syne',sans-serif; font-size:12px; font-weight:700; color:var(--text2); text-transform:uppercase; letter-spacing:1px; }
+.cmp-box { text-align:center; }
+.cmp-box .lbl { font-size:11px; color:var(--muted); }
+.cmp-box .val { font-family:'Syne',sans-serif; font-size:24px; font-weight:800; line-height:1.1; }
+.cmp-arrow { font-size:30px; color:var(--muted); }
+.cmp-pill {
+  margin-left:auto;
+  background:linear-gradient(135deg,var(--green),var(--accent2));
+  color:#fff;
+  font-family:'Syne',sans-serif; font-weight:700; font-size:14px;
+  padding:10px 22px; border-radius:30px;
+  box-shadow:0 4px 14px rgba(0,184,153,0.3);
+}
+
+/* ── CHARTS ROW ── */
+.charts-row {
+  display:grid;
+  grid-template-columns:1fr 1fr 260px;
+  gap:16px; margin-bottom:22px;
+}
+.chart-card {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:20px;
+  box-shadow:var(--shadow);
+}
+.chart-ttl { font-family:'Syne',sans-serif; font-size:13px; font-weight:700; margin-bottom:3px; }
+.chart-sub { font-size:11px; color:var(--muted); margin-bottom:14px; }
+
+/* SVG charts */
+.svg-area { width:100%; overflow:visible; }
+
+/* Semáforo */
+.sem-list { display:flex; flex-direction:column; gap:10px; }
+.sem-row {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 14px; border-radius:10px; border:1px solid var(--border);
+}
+.sem-left  { display:flex; align-items:center; gap:9px; }
+.sem-dot   { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
+.sem-name  { font-size:12px; font-weight:500; }
+.sem-hint  { font-size:10px; color:var(--muted); }
+.sem-badge { font-size:11px; font-weight:700; padding:3px 10px; border-radius:10px; }
+.s-g  { background:#e7f9f2; color:var(--green); border-color:rgba(28,184,126,0.15); }
+.s-g .sem-dot { background:var(--green); }
+.s-g .sem-badge { background:#d0f4e8; color:var(--green); }
+.s-y  { background:var(--yellow-lt); border-color:rgba(245,166,35,0.15); }
+.s-y .sem-dot { background:var(--yellow); }
+.s-y .sem-badge { background:#fde9c0; color:var(--yellow); }
+.s-r  { background:var(--red-lt); border-color:rgba(232,67,67,0.15); }
+.s-r .sem-dot { background:var(--red); }
+.s-r .sem-badge { background:#fdd0d0; color:var(--red); }
+
+/* ── OPS ROW ── */
+.ops-row {
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:16px; margin-bottom:22px;
+}
+
+/* Bar chart */
+.bar-rows { display:flex; flex-direction:column; gap:9px; }
+.br { display:flex; align-items:center; gap:8px; }
+.br-name { font-size:11px; color:var(--text2); width:75px; flex-shrink:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.br-track { flex:1; background:#f0f2f8; border-radius:4px; height:8px; overflow:hidden; }
+.br-fill  { height:100%; border-radius:4px; transition:width 1s ease; }
+.br-num   { font-size:11px; font-family:'Syne',sans-serif; font-weight:700; width:20px; text-align:right; }
+.br-days  { font-size:10px; color:var(--muted); width:40px; text-align:right; }
+
+/* Donut */
+.donut-wrap { display:flex; align-items:center; justify-content:center; gap:18px; margin-top:4px; }
+.donut-legend { display:flex; flex-direction:column; gap:8px; }
+.leg-item { display:flex; align-items:center; gap:7px; font-size:11px; }
+.leg-dot  { width:9px; height:9px; border-radius:3px; flex-shrink:0; }
+
+/* Funnel */
+.funnel { display:flex; flex-direction:column; align-items:stretch; gap:5px; margin-top:6px; }
+.fn-step {
+  border-radius:8px; padding:9px 14px;
+  display:flex; align-items:center; justify-content:space-between;
+  font-size:12px; font-weight:500;
+}
+.fn-val { font-family:'Syne',sans-serif; font-size:17px; font-weight:800; }
+.fn-arrow { text-align:center; font-size:11px; color:var(--muted); padding:1px 0; }
+.fn-conv  { font-size:10px; color:var(--muted); text-align:center; margin-top:4px; }
+
+/* ── TABLE ── */
+.table-card {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:20px;
+  box-shadow:var(--shadow);
+  margin-bottom:22px;
+}
+.table-header {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:14px; flex-wrap:wrap; gap:10px;
+}
+.search-bar {
+  display:flex; align-items:center; gap:7px;
+  background:#f5f7fc; border:1px solid var(--border);
+  border-radius:8px; padding:7px 12px;
+  transition:.15s;
+}
+.search-bar:focus-within { border-color:var(--accent); background:#fff; }
+.search-bar input {
+  background:none; border:none; outline:none;
+  font-family:'DM Sans',sans-serif; font-size:13px; color:var(--text);
+  width:220px;
+}
+.search-bar input::placeholder { color:var(--muted); }
+.tbl-count { font-size:12px; color:var(--muted); margin-left:4px; }
+
+table { width:100%; border-collapse:collapse; }
+thead th {
+  font-size:11px; text-transform:uppercase; letter-spacing:.8px;
+  color:var(--muted); font-weight:600;
+  padding:8px 10px; text-align:left;
+  border-bottom:2px solid var(--border);
+  background:#fafbff;
+}
+thead th:first-child { border-radius:8px 0 0 0; }
+thead th:last-child  { border-radius:0 8px 0 0; }
+tbody tr { border-bottom:1px solid #f0f2f8; transition:background .1s; }
+tbody tr:hover { background:#f7f9ff; }
+tbody td { padding:10px 10px; font-size:12px; vertical-align:middle; }
+.td-a  { color:var(--accent); font-size:11px; font-weight:500; }
+.td-f  { font-weight:500; color:var(--text); }
+.td-dt { color:var(--muted); font-size:11px; }
+
+.pill {
+  display:inline-flex; align-items:center; gap:4px;
+  padding:3px 9px; border-radius:20px; font-size:10px; font-weight:700;
+}
+.pill .dot2 { width:5px; height:5px; border-radius:50%; }
+.p-sap     { background:#e7f9f2; color:var(--green); }
+.p-sap .dot2    { background:var(--green); }
+.p-proc    { background:var(--yellow-lt); color:var(--yellow); }
+.p-proc .dot2   { background:var(--yellow); }
+.p-esc     { background:var(--purple-lt); color:var(--purple); }
+.p-esc .dot2    { background:var(--purple); }
+.p-rec     { background:var(--red-lt); color:var(--red); }
+.p-rec .dot2    { background:var(--red); }
+.p-fmt     { background:#eef6ff; color:#3a85e8; }
+.p-fmt .dot2    { background:#3a85e8; }
+.p-esp     { background:#fff0e6; color:#d4762a; }
+.p-esp .dot2    { background:#d4762a; }
+
+.sla-ok   { color:var(--green); font-weight:700; font-size:11px; }
+.sla-warn { color:var(--yellow); font-weight:700; font-size:11px; }
+.sla-bad  { color:var(--red);   font-weight:700; font-size:11px; }
+.sla-pend { color:var(--muted); font-size:11px; }
+
+/* ── INSIGHTS ── */
+.insights-grid {
+  display:grid; grid-template-columns:repeat(3,1fr);
+  gap:14px; margin-bottom:24px;
+}
+.ins-card {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:16px 18px;
+  box-shadow:var(--shadow);
+  display:flex; gap:12px; align-items:flex-start;
+}
+.ins-icon {
+  font-size:20px; width:40px; height:40px;
+  border-radius:10px;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+}
+.ins-card h4 { font-family:'Syne',sans-serif; font-size:12px; font-weight:700; margin-bottom:4px; }
+.ins-card p  { font-size:11px; color:var(--text2); line-height:1.55; }
+
+/* ── FOOTER ── */
+.page-footer {
+  text-align:center; font-size:11px; color:var(--muted);
+  padding:14px 0 20px;
+  border-top:1px solid var(--border);
+}
+
+/* ANIMATIONS */
+.kpi-card { animation:fadeUp .4s ease both; }
+.kpi-card:nth-child(1){animation-delay:.04s}
+.kpi-card:nth-child(2){animation-delay:.08s}
+.kpi-card:nth-child(3){animation-delay:.12s}
+.kpi-card:nth-child(4){animation-delay:.16s}
+.kpi-card:nth-child(5){animation-delay:.20s}
+.kpi-card:nth-child(6){animation-delay:.24s}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+/* no-results */
+.no-results { text-align:center; padding:28px; color:var(--muted); font-size:13px; }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-box">A</div>
+      <div>
+        
+      </div>
+    </div>
+    <div class="sidebar-section">Principal</div>
+    <div class="nav-item active"><span class="nav-icon">🏠</span> Dashboard</div>
+    <div class="nav-item"><span class="nav-icon">📦</span> Proveedores</div>
+    <div class="nav-item"><span class="nav-icon">👥</span> Analistas</div>
+    <div class="sidebar-section">Reportes</div>
+    <div class="nav-item"><span class="nav-icon">📊</span> KPIs Mensuales</div>
+    <div class="nav-item"><span class="nav-icon">⏱</span> SLA & Tiempos</div>
+    <div class="nav-item"><span class="nav-icon">📋</span> Estado Casos</div>
+    <div class="nav-item"><span class="nav-icon">🔄</span> Embudo Proceso</div>
+    <div class="sidebar-section">Sistema</div>
+    <div class="nav-item"><span class="nav-icon">⚙️</span> Configuración</div>
+    <div class="sidebar-footer">
+      Gestión Proveedores SAP<br>Módulo MM · Auteco 2026
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div>
+        <div class="page-title">Creación de Clientes y Proveedores</div>
+        
+      </div>
+      <div class="topbar-right">
+        <div class="badge-date">📅 Corte: 11/03/2026</div>
+        <div class="live-chip"><span class="dot"></span>Actualizado</div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- FILTERS -->
+      <div class="filters-panel">
+        <span class="filter-label">🔽 Filtros</span>
+        <div class="filter-group">
+          <span class="filter-label">Mes</span>
+          <select class="filter-select" id="fMes" onchange="applyFilters()">
+            <option value="">Todos</option>
+            <option value="1">Enero</option>
+            <option value="2">Febrero</option>
+            <option value="3">Marzo</option>
+          </select>
+        </div>
+        <div class="divider"></div>
+        <div class="filter-group">
+          <span class="filter-label">Analista</span>
+          <select class="filter-select" id="fAnalista" onchange="applyFilters()">
+            <option value="">Todos</option>
+          </select>
+        </div>
+        <div class="divider"></div>
+        <div class="filter-group">
+          <span class="filter-label">Estado</span>
+          <select class="filter-select" id="fEstado" onchange="applyFilters()">
+            <option value="">Todos</option>
+          </select>
+        </div>
+        <div class="divider"></div>
+        <div class="filter-group">
+          <span class="filter-label">SLA</span>
+          <select class="filter-select" id="fSla" onchange="applyFilters()">
+            <option value="">Todos</option>
+            <option value="ok">✅ En plazo (≤5d)</option>
+            <option value="warn">⚠️ Advertencia (6-8d)</option>
+            <option value="bad">🔴 Vencido (&gt;8d)</option>
+          </select>
+        </div>
+        <button class="btn-reset" onclick="resetFilters()">↺ Limpiar</button>
+      </div>
+
+      <!-- KPI ZONE -->
+      <div class="sec-label">📊 KPIs Ejecutivos</div>
+      <div class="kpi-grid">
+        <div class="kpi-card kpi-blue">
+          <div class="kpi-icon-wrap">📥</div>
+          <div class="kpi-lbl">Total Radicados</div>
+          <div class="kpi-val" id="kTotal">—</div>
+          <div class="kpi-badge b-neu" id="kTotalSub"></div>
+        </div>
+        <div class="kpi-card kpi-teal">
+          <div class="kpi-icon-wrap">✅</div>
+          <div class="kpi-lbl">Creados en SAP</div>
+          <div class="kpi-val" id="kCreados">—</div>
+          <div class="kpi-badge b-up" id="kCreadosSub"></div>
+        </div>
+        <div class="kpi-card kpi-green">
+          <div class="kpi-icon-wrap">🎯</div>
+          <div class="kpi-lbl">Tasa de Creación</div>
+          <div class="kpi-val" id="kTasa">—</div>
+          <div class="kpi-badge b-war" id="kTasaSub"></div>
+        </div>
+        <div class="kpi-card kpi-yellow">
+          <div class="kpi-icon-wrap">⏱</div>
+          <div class="kpi-lbl">Tiempo Prom. (días)</div>
+          <div class="kpi-val" id="kTiempo">—</div>
+          <div class="kpi-badge b-up" id="kTiempoSub"></div>
+        </div>
+        <div class="kpi-card kpi-red">
+          <div class="kpi-icon-wrap">⚠️</div>
+          <div class="kpi-lbl">Pendientes / Gestión</div>
+          <div class="kpi-val" id="kPend">—</div>
+          <div class="kpi-badge b-dn" id="kPendSub"></div>
+        </div>
+        <div class="kpi-card kpi-purple">
+          <div class="kpi-icon-wrap">👥</div>
+          <div class="kpi-lbl">Analistas Activos</div>
+          <div class="kpi-val" id="kAnalistas">—</div>
+          <div class="kpi-badge b-neu" id="kAnalistasSub"></div>
+        </div>
+      </div>
+
+      <!-- COMPARISON BANNER -->
+      <div class="cmp-banner" id="cmpBanner">
+        <div>
+          <div class="cmp-title">🚀 Impacto de Automatización SAP</div>
+        </div>
+        <div class="cmp-box">
+          <div class="lbl">Proceso Manual</div>
+          <div class="val" style="color:var(--red)">11 días</div>
+        </div>
+        <div class="cmp-arrow">→</div>
+        <div class="cmp-box">
+          <div class="lbl">Proceso Actual</div>
+          <div class="val" style="color:var(--green)" id="cmpTiempo">— días</div>
+        </div>
+        <div class="cmp-arrow">→</div>
+        <div class="cmp-box">
+          <div class="lbl">Ahorro por proveedor</div>
+          <div class="val" style="color:var(--accent)" id="cmpAhorro">— días</div>
+        </div>
+        <div class="cmp-pill" id="cmpMejora">— más rápido</div>
+      </div>
+
+      <!-- TRENDS + SEMAFORO -->
+      <div class="sec-label">📉 Tendencias y Semáforo</div>
+      <div class="charts-row">
+
+        <div class="chart-card">
+          <div class="chart-ttl">Radicados por Mes</div>
+          <div class="chart-sub">Solicitudes ingresadas · enero–marzo 2026</div>
+          <svg class="svg-area" viewBox="0 0 340 120" height="120">
+            <defs>
+              <linearGradient id="ga" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#3a56e8" stop-opacity=".2"/>
+                <stop offset="100%" stop-color="#3a56e8" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <line x1="0" y1="15" x2="340" y2="15" stroke="#e2e6f0" stroke-width="1"/>
+            <line x1="0" y1="55" x2="340" y2="55" stroke="#e2e6f0" stroke-width="1"/>
+            <line x1="0" y1="95" x2="340" y2="95" stroke="#e2e6f0" stroke-width="1"/>
+            <text x="0" y="12" fill="#8b93b0" font-size="8">30</text>
+            <text x="0" y="52" fill="#8b93b0" font-size="8">20</text>
+            <text x="0" y="92" fill="#8b93b0" font-size="8">10</text>
+            <!-- Ene=26, Feb=87/59=apróx·usamos datos reales más abajo via JS -->
+            <path id="pathRad" d="" fill="url(#ga)" stroke="none"/>
+            <polyline id="lineRad" points="" fill="none" stroke="#3a56e8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle id="dotRad" cx="0" cy="0" r="5" fill="#3a56e8"/>
+            <text x="20"  y="112" fill="#8b93b0" font-size="9" text-anchor="middle">Ene</text>
+            <text x="170" y="112" fill="#8b93b0" font-size="9" text-anchor="middle">Feb</text>
+            <text x="320" y="112" fill="#3a56e8" font-size="9" font-weight="bold" text-anchor="middle">Mar</text>
+          </svg>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-ttl">Creaciones SAP por Mes</div>
+          <div class="chart-sub">Proveedores efectivamente creados en sistema</div>
+          <svg class="svg-area" viewBox="0 0 340 120" height="120">
+            <defs>
+              <linearGradient id="gb" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#00b899" stop-opacity=".2"/>
+                <stop offset="100%" stop-color="#00b899" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <line x1="0" y1="15" x2="340" y2="15" stroke="#e2e6f0" stroke-width="1"/>
+            <line x1="0" y1="55" x2="340" y2="55" stroke="#e2e6f0" stroke-width="1"/>
+            <line x1="0" y1="95" x2="340" y2="95" stroke="#e2e6f0" stroke-width="1"/>
+            <text x="0" y="12" fill="#8b93b0" font-size="8">25</text>
+            <text x="0" y="52" fill="#8b93b0" font-size="8">15</text>
+            <text x="0" y="92" fill="#8b93b0" font-size="8">5</text>
+            <path id="pathCre" d="" fill="url(#gb)" stroke="none"/>
+            <polyline id="lineCre" points="" fill="none" stroke="#00b899" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle id="dotCre" cx="0" cy="0" r="5" fill="#00b899"/>
+            <text x="20"  y="112" fill="#8b93b0" font-size="9" text-anchor="middle">Ene</text>
+            <text x="170" y="112" fill="#8b93b0" font-size="9" text-anchor="middle">Feb</text>
+            <text x="320" y="112" fill="#00b899" font-size="9" font-weight="bold" text-anchor="middle">Mar</text>
+          </svg>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-ttl">Semáforo de Proceso</div>
+          <div class="chart-sub">Estado de indicadores clave</div>
+          <div class="sem-list" id="semList"></div>
+        </div>
+      </div>
+
+      <!-- OPERATIONAL -->
+      <div class="sec-label">⚙️ Análisis Operativo</div>
+      <div class="ops-row">
+        <div class="chart-card">
+          <div class="chart-ttl">Carga por Analista</div>
+          <div class="chart-sub">Casos totales · Tiempo prom. creación</div>
+          <div class="bar-rows" id="barAnalista"></div>
+          <div id="alertaCarga" style="margin-top:12px;font-size:11px;padding:8px 12px;border-radius:8px;display:none;"></div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-ttl">Distribución por Estado</div>
+          <div class="chart-sub">Todos los casos radicados</div>
+          <div class="donut-wrap">
+            <svg id="donutSvg" width="120" height="120" viewBox="0 0 120 120"></svg>
+            <div class="donut-legend" id="donutLegend"></div>
+          </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-ttl">Embudo del Proceso</div>
+          <div class="chart-sub">Radicado → Creación SAP</div>
+          <div class="funnel" id="funnel"></div>
+        </div>
+      </div>
+
+      <!-- TABLE -->
+      <div class="sec-label">📋 Detalle Operativo</div>
+      <div class="table-card">
+        <div class="table-header">
+          <div>
+            <div class="chart-ttl">Listado Completo de Casos</div>
+            <div class="chart-sub" id="tblCountLbl">59 registros · Con indicadores de SLA</div>
+          </div>
+          <div class="search-bar">
+            <span>🔍</span>
+            <input type="text" id="searchInput" placeholder="Buscar proveedor, analista o estado..." oninput="applyFilters()">
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Analista</th>
+                <th>Carpeta / Proveedor</th>
+                <th>Estado</th>
+                <th>F. Registro</th>
+                <th>F. Creación SAP</th>
+                <th>Días</th>
+                <th>SLA</th>
+              </tr>
+            </thead>
+            <tbody id="tblBody"></tbody>
+          </table>
+          <div class="no-results" id="noResults" style="display:none">Sin resultados para los filtros seleccionados.</div>
+        </div>
+      </div>
+
+      <!-- INSIGHTS -->
+      <div class="sec-label">💡 Insights Automáticos</div>
+      <div class="insights-grid" id="insightsGrid"></div>
+
+      <div class="page-footer">
+        AUTECO · Dashboard Gestión de Proveedores SAP · Módulo MM · Datos corte 11/03/2026
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /layout -->
+
+<script>
+// ── DATASET COMPLETO (59 registros del Excel) ──
+const RAW = [
+  ['aurrego@auteco.com','ABURRA PRODUCCIONES S.A.S.-59','CREADO EN SAP','2026-03-09','2026-03-11'],
+  ['tytaborda@auteco.com','AKTIV GESTION DE ACTIVOS S A S-8','CREADO EN SAP','2026-01-29','2026-02-03'],
+  ['aurrego@auteco.com','AMERICAN NAKA GROUP S.A.S.-27','CREADO EN SAP','2026-02-10','2026-02-10'],
+  ['jtrujillo@auteco.com','ANAVA FZ SERVICES S.A.S.-51','ESCALADO A CUMPLIMIENTO','2026-03-02',null],
+  ['aurrego@auteco.com','ASISTENCIA VIAL SAS-47','CREADO EN SAP','2026-02-26','2026-02-28'],
+  ['aurrego@auteco.com','ASOCIACION DE GESTION HUMANA ACRIP BOGOTA Y CUNDINAMARCA-37','CREADO EN SAP','2026-02-18','2026-02-24'],
+  ['aurrego@auteco.com','ASOCIACIÓN DE TRASNPORTE PÚBLICO COLECTIVO DEL VALLE DE ÁBURRA-12','CREADO EN SAP','2026-02-02','2026-02-09'],
+  ['arios@auteco.com','AUTONIZA S A-33','FORMATO DE VINCULACIÓN DILIGENCIADO','2026-02-17',null],
+  ['etabares@auteco.com','AXITY COLOMBIA SAS-3','CREADO EN SAP','2026-01-28','2026-02-04'],
+  ['sossa@auteco.com','BRIAN STEVEN VALENCIA-58','CREADO EN SAP','2026-03-06','2026-03-11'],
+  ['aurrego@auteco.com','BUENA VIBRA SOCIAL CLUB S.A.S.-17','CREADO EN SAP','2026-02-03','2026-02-05'],
+  ['etabares@auteco.com','C.S.I. CONSULTORES SEGURIDAD INTEGRAL LTDA.-24','CREADO EN SAP','2026-02-09','2026-02-13'],
+  ['arios@auteco.com','Carlos Alberto Vanegas-9','CREADO EN SAP','2026-01-30','2026-02-05'],
+  ['aurrego@auteco.com','COMERCIAL MODERNA CORP S.A.S-13','CREADO EN SAP','2026-02-02','2026-02-03'],
+  ['wtom@auteco.com','CONSORCIO INTERNACIONAL DE SOLUCIONES INTEGRALES S.A.S. B.I.C-21','CREADO EN SAP','2026-02-06','2026-02-09'],
+  ['wtom@auteco.com','CONSTRUCARIBE JK SAS-18','CREADO EN SAP','2026-02-03','2026-02-05'],
+  ['aurrego@auteco.com','CREACONSENTIDO7 S.A.S.-16','CREADO EN SAP','2026-02-03','2026-02-05'],
+  ['sossa@auteco.com','DIEGO ALEJANDRO MARIN VELEZ-40','CREADO EN SAP','2026-02-23','2026-03-04'],
+  ['jtrujillo@auteco.com','DU VENT CASA DE EVENTOS S.A.S.-31','CREADO EN SAP','2026-02-11','2026-02-12'],
+  ['aurrego@auteco.com','Epopeya Colombia SAS-41','CREADO EN SAP','2026-02-23','2026-02-25'],
+  ['jtrujillo@auteco.com','EQL LOGISTICS S.A.S-54','EN ESPERA DE APROBACIÓN ESTRADATA','2026-03-02',null],
+  ['jtrujillo@auteco.com','EQUILIBRIA GROUP S.A.S.-55','CREADO EN SAP','2026-03-02','2026-03-04'],
+  ['aurrego@auteco.com','EXKLUS UNIFORMES S.A.S.-36','CREADO EN SAP','2026-02-18','2026-02-24'],
+  ['tytaborda@auteco.com','FUNDACION FANALCA-15','CREADO EN SAP','2026-02-03','2026-02-06'],
+  ['etabares@auteco.com','GREEN LOOP SUSTAINABLE ARCHITECTURE AND ENGINEERING LTDA-28','CREADO EN SAP','2026-02-10','2026-02-19'],
+  ['arios@auteco.com','INGENIERIA SOLUCIONES INTEGRALES T.C.-50','CREADO EN SAP','2026-02-27','2026-03-02'],
+  ['aurrego@auteco.com','INVERSIONES LOGUZ SAS-10','CREADO EN SAP','2026-01-31','2026-02-05'],
+  ['wtom@auteco.com','IPSUM AUTOMATIZACIÓN S.A.S-19','CREADO EN SAP','2026-02-05','2026-02-05'],
+  ['tytaborda@auteco.com','J.A.R. PROYECTOS CIVILES S.A.S.-7','CREADO EN SAP','2026-01-29','2026-02-02'],
+  ['aurrego@auteco.com','Jonathan Uribe Mendoza-5','CREADO EN SAP','2026-01-29','2026-01-30'],
+  ['arios@auteco.com','Juan Manuel Quijano-4','CREADO EN SAP','2026-01-28','2026-01-30'],
+  ['aurrego@auteco.com','LIBERU S.A.S-60','CREADO EN SAP','2026-03-09','2026-03-11'],
+  ['jtrujillo@auteco.com','LUIS ALBERTO GARZON PROPIEDAD RAIZ S.A.S-30','RECHAZADO ANALISTA','2026-02-11',null],
+  ['jtrujillo@auteco.com','Luis Alberto Garzón Propiedad Raíz S.A.S-32','CREADO EN SAP','2026-02-12','2026-02-12'],
+  ['aurrego@auteco.com','María Camila Delgado Calderon-11','RECHAZADO CUMPLIMIENTO','2026-02-02',null],
+  ['etabares@auteco.com','MARIA CARMIÑA VILLEGAS CORREA-20','RECHAZADO ANALISTA','2026-02-05',null],
+  ['etabares@auteco.com','MARIA CARMIÑA VILLEGAS CORREA-26','CREADO EN SAP','2026-02-09','2026-02-11'],
+  ['wtom@auteco.com','MAS INGENIERIA SAS-14','CREADO EN SAP','2026-02-03','2026-02-03'],
+  ['arios@auteco.com','Mayra Alejandra Molina Pertuz-29','CREADO EN SAP','2026-02-10','2026-02-12'],
+  ['arios@auteco.com','MEGASERVIC SAS-34','CREADO EN SAP','2026-02-17','2026-02-24'],
+  ['arios@auteco.com','MORARCI GROUP S.A.S.-45','CREADO EN SAP','2026-02-24','2026-03-07'],
+  ['etabares@auteco.com','ONA SYSTEMS S A S-35','CREADO EN SAP','2026-02-18','2026-02-18'],
+  ['aurrego@auteco.com','OSCAR RENTERIA JIMENEZ-57','CREADO EN SAP','2026-03-06','2026-03-07'],
+  ['aurrego@auteco.com','PASKINES STUNT S.A.S.-22','CREADO EN SAP','2026-02-06','2026-02-09'],
+  ['tytaborda@auteco.com','PROYECTOS SANTA CRUZ SAS-2','CREADO EN SAP','2026-01-26','2026-01-27'],
+  ['arios@auteco.com','REPRESENTACIONES DAGLO S.A.S.-1','CREADO EN SAP','2026-01-26','2026-01-27'],
+  ['jtrujillo@auteco.com','RJM GROUP S.A.S.-52','RECHAZADO ANALISTA','2026-03-02',null],
+  ['jtrujillo@auteco.com','RJM GROUP S.A.S.-53','FORMATO DE VINCULACIÓN DILIGENCIADO','2026-03-02',null],
+  ['jtrujillo@auteco.com','SCM LOGCENTER SAS-48','RECHAZADO ANALISTA','2026-02-27',null],
+  ['jtrujillo@auteco.com','SCM LOGCENTER SAS-49','CREADO EN SAP','2026-02-27','2026-03-04'],
+  ['aurrego@auteco.com','SIMETRIK S.A.S-38','FORMATO DE VINCULACIÓN ENVIADO','2026-02-19',null],
+  ['aurrego@auteco.com','SKLA 2V3 S.A.S-39','CREADO EN SAP','2026-02-23','2026-02-24'],
+  ['wtom@auteco.com','SMIT PRO S.A.S-43','CREADO EN SAP','2026-02-24','2026-02-25'],
+  ['wtom@auteco.com','SPECIAL GROUP INGENIEROS S.A.S-23','RECHAZADO ANALISTA','2026-02-09',null],
+  ['wtom@auteco.com','SPECIAL GROUP INGENIEROS S.A.S-25','CREADO EN SAP','2026-02-09','2026-02-11'],
+  ['aurrego@auteco.com','SWEBCOL SAS-42','CREADO EN SAP','2026-02-24','2026-02-25'],
+  ['jtrujillo@auteco.com','TERCERIZADO COMPLEMENTARIO 4 S.A.S-61','CREADO EN SAP','2026-03-09','2026-03-11'],
+  ['jtrujillo@auteco.com','THR LOGÍSTICA S.A.S.-56','FORMATO DE VINCULACIÓN ENVIADO','2026-03-03',null],
+  ['aurrego@auteco.com','Wilder Zapata-46','CREADO EN SAP','2026-02-26','2026-03-07'],
+];
+
+// Parse data
+const DATA = RAW.map((r,i) => {
+  const reg = new Date(r[3]);
+  const cre = r[4] ? new Date(r[4]) : null;
+  const dias = cre ? Math.round((cre - reg)/(1000*60*60*24)) : null;
+  const mes  = reg.getMonth()+1;
+  let sla = null;
+  if (dias !== null) {
+    if (dias <= 5) sla = 'ok';
+    else if (dias <= 8) sla = 'warn';
+    else sla = 'bad';
+  }
+  return { idx:i+1, analista:r[0].trim(), carpeta:r[1], estado:r[2], reg, cre, dias, mes, sla };
+});
+
+// Populate filter options
+function populateFilters() {
+  const analistas = [...new Set(DATA.map(d=>d.analista))].sort();
+  const estados   = [...new Set(DATA.map(d=>d.estado))].sort();
+  const fA = document.getElementById('fAnalista');
+  const fE = document.getElementById('fEstado');
+  analistas.forEach(a => { const o=document.createElement('option'); o.value=a; o.textContent=a; fA.appendChild(o); });
+  estados.forEach(e =>   { const o=document.createElement('option'); o.value=e; o.textContent=e; fE.appendChild(o); });
+}
+
+function getFiltered() {
+  const mes      = document.getElementById('fMes').value;
+  const analista = document.getElementById('fAnalista').value;
+  const estado   = document.getElementById('fEstado').value;
+  const sla      = document.getElementById('fSla').value;
+  const search   = document.getElementById('searchInput').value.toLowerCase().trim();
+  return DATA.filter(d => {
+    if (mes      && d.mes !== parseInt(mes))       return false;
+    if (analista && d.analista !== analista)        return false;
+    if (estado   && d.estado !== estado)            return false;
+    if (sla      && d.sla !== sla)                  return false;
+    if (search   && !`${d.analista} ${d.carpeta} ${d.estado}`.toLowerCase().includes(search)) return false;
+    return true;
+  });
+}
+
+function fmtDate(d) { if(!d) return '—'; return d.toLocaleDateString('es-CO',{day:'2-digit',month:'2-digit',year:'numeric'}); }
+function shortA(a) { return a.split('@')[0]; }
+
+// Status pill
+const ESTADO_PILL = {
+  'CREADO EN SAP':                       ['p-sap','✅'],
+  'EN ESPERA DE APROBACIÓN ESTRADATA':   ['p-esp','🔄'],
+  'ESCALADO A CUMPLIMIENTO':             ['p-esc','🔼'],
+  'FORMATO DE VINCULACIÓN DILIGENCIADO': ['p-fmt','📝'],
+  'FORMATO DE VINCULACIÓN ENVIADO':      ['p-fmt','📤'],
+  'RECHAZADO ANALISTA':                  ['p-rec','❌'],
+  'RECHAZADO CUMPLIMIENTO':              ['p-rec','🚫'],
+};
+
+function slaHtml(r) {
+  if (r.dias === null) return `<span class="sla-pend">Pendiente</span>`;
+  if (r.sla==='ok')   return `<span class="sla-ok">✓ ${r.dias}d</span>`;
+  if (r.sla==='warn') return `<span class="sla-warn">⚠ ${r.dias}d</span>`;
+  return `<span class="sla-bad">🔴 ${r.dias}d</span>`;
+}
+
+// DONUT
+const ESTADO_COLORS = {
+  'CREADO EN SAP':'#1cb87e',
+  'EN ESPERA DE APROBACIÓN ESTRADATA':'#d4762a',
+  'ESCALADO A CUMPLIMIENTO':'#7c5cbf',
+  'FORMATO DE VINCULACIÓN DILIGENCIADO':'#3a85e8',
+  'FORMATO DE VINCULACIÓN ENVIADO':'#5aabff',
+  'RECHAZADO ANALISTA':'#e84343',
+  'RECHAZADO CUMPLIMIENTO':'#ff7e7e',
+};
+const BAR_COLORS=['#3a56e8','#00b899','#f5a623','#7c5cbf','#e84343','#1cb87e'];
+
+function buildDonut(filtered) {
+  const counts = {};
+  filtered.forEach(d => { counts[d.estado]=(counts[d.estado]||0)+1; });
+  const total = filtered.length;
+  const svg = document.getElementById('donutSvg');
+  const leg = document.getElementById('donutLegend');
+  svg.innerHTML=''; leg.innerHTML='';
+
+  const R=44, cx=60, cy=60, stroke=18;
+  let offset = -Math.PI/2;
+  const circ = 2*Math.PI*R;
+
+  // Background circle
+  const bg=document.createElementNS('http://www.w3.org/2000/svg','circle');
+  bg.setAttribute('cx',cx); bg.setAttribute('cy',cy); bg.setAttribute('r',R);
+  bg.setAttribute('fill','none'); bg.setAttribute('stroke','#f0f2f8'); bg.setAttribute('stroke-width',stroke);
+  svg.appendChild(bg);
+
+  Object.entries(counts).forEach(([estado, cnt]) => {
+    const frac = cnt/total;
+    const dashLen = frac*circ;
+    const dashGap = circ-dashLen;
+    const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    c.setAttribute('cx',cx); c.setAttribute('cy',cy); c.setAttribute('r',R);
+    c.setAttribute('fill','none');
+    c.setAttribute('stroke', ESTADO_COLORS[estado]||'#aaa');
+    c.setAttribute('stroke-width',stroke);
+    c.setAttribute('stroke-dasharray',`${dashLen} ${dashGap}`);
+    c.setAttribute('stroke-dashoffset', -offset*R);
+    c.setAttribute('transform',`rotate(${offset*(180/Math.PI)-90} ${cx} ${cy})`);
+    svg.appendChild(c);
+    offset += 2*Math.PI*frac;
+
+    // Legend
+    const li=document.createElement('div'); li.className='leg-item';
+    li.innerHTML=`<div class="leg-dot" style="background:${ESTADO_COLORS[estado]||'#aaa'}"></div>
+      <span style="font-size:10px">${estado.split(' ').slice(0,3).join(' ')} <strong>${cnt}</strong></span>`;
+    leg.appendChild(li);
+  });
+
+  // Center text
+  const creados = counts['CREADO EN SAP']||0;
+  const t1=document.createElementNS('http://www.w3.org/2000/svg','text');
+  t1.setAttribute('x',cx); t1.setAttribute('y',cy-4); t1.setAttribute('text-anchor','middle');
+  t1.setAttribute('fill','#1a2035'); t1.setAttribute('font-size','16'); t1.setAttribute('font-weight','800');
+  t1.setAttribute('font-family','Syne,sans-serif');
+  t1.textContent=`${Math.round(creados/total*100)}%`;
+  const t2=document.createElementNS('http://www.w3.org/2000/svg','text');
+  t2.setAttribute('x',cx); t2.setAttribute('y',cy+10); t2.setAttribute('text-anchor','middle');
+  t2.setAttribute('fill','#8b93b0'); t2.setAttribute('font-size','8');
+  t2.textContent='Tasa SAP';
+  svg.appendChild(t1); svg.appendChild(t2);
+}
+
+function buildBars(filtered) {
+  const byCounts={}, byDays={}, byCnt={};
+  filtered.forEach(d => {
+    byCounts[d.analista]=(byCounts[d.analista]||0)+1;
+    if(d.dias!==null){ byDays[d.analista]=(byDays[d.analista]||0)+d.dias; byCnt[d.analista]=(byCnt[d.analista]||0)+1; }
+  });
+  const sorted=Object.entries(byCounts).sort((a,b)=>b[1]-a[1]);
+  const max=sorted[0]?.[1]||1;
+  const el=document.getElementById('barAnalista');
+  el.innerHTML='';
+  sorted.forEach(([a,cnt],i)=>{
+    const prom = byCnt[a]?((byDays[a]/byCnt[a]).toFixed(1)):'—';
+    const pct=Math.round(cnt/max*100);
+    el.innerHTML+=`<div class="br">
+      <div class="br-name" title="${a}">${shortA(a)}</div>
+      <div class="br-track"><div class="br-fill" style="width:0%;background:${BAR_COLORS[i%BAR_COLORS.length]}" data-w="${pct}"></div></div>
+      <div class="br-num" style="color:${BAR_COLORS[i%BAR_COLORS.length]}">${cnt}</div>
+      <div class="br-days">${prom}d</div>
+    </div>`;
+  });
+  // Animate
+  setTimeout(()=>{
+    document.querySelectorAll('.br-fill').forEach(f=>{
+      f.style.width=f.dataset.w+'%';
+    });
+  }, 50);
+
+  // Alerta concentración
+  const alert=document.getElementById('alertaCarga');
+  if(sorted.length>0 && filtered.length>0){
+    const [topA,topC]=sorted[0];
+    const pct=Math.round(topC/filtered.length*100);
+    if(pct>=50){
+      alert.style.display='block';
+      alert.style.cssText+=';background:#fdf0f0;border:1px solid rgba(232,67,67,.15);border-radius:8px;padding:8px 12px;font-size:11px;color:#e84343;margin-top:12px;';
+      alert.textContent=`⚠️ ${shortA(topA)} concentra el ${pct}% de la carga (${topC} casos). Riesgo operativo.`;
+    } else { alert.style.display='none'; }
+  }
+}
+
+function buildFunnel(filtered) {
+  const total=filtered.length;
+  const creados=filtered.filter(d=>d.estado==='CREADO EN SAP').length;
+  const pending=filtered.filter(d=>d.estado!=='CREADO EN SAP'&&d.estado!=='RECHAZADO ANALISTA'&&d.estado!=='RECHAZADO CUMPLIMIENTO').length;
+  const rechazados=filtered.filter(d=>d.estado==='RECHAZADO ANALISTA'||d.estado==='RECHAZADO CUMPLIMIENTO').length;
+  const tasa=total?Math.round(creados/total*100):0;
+  const el=document.getElementById('funnel');
+  el.innerHTML=`
+    <div class="fn-step" style="background:#eef1fd;border:1px solid rgba(58,86,232,0.2)">
+      <span>📥 Radicados</span><span class="fn-val" style="color:#3a56e8">${total}</span>
+    </div>
+    <div class="fn-arrow">▼ proceso</div>
+    <div class="fn-step" style="background:#fff8ec;border:1px solid rgba(245,166,35,0.2);width:92%">
+      <span>⚙️ En gestión</span><span class="fn-val" style="color:#f5a623">${pending}</span>
+    </div>
+    <div class="fn-arrow">▼ creación</div>
+    <div class="fn-step" style="background:#e7f9f2;border:1px solid rgba(28,184,126,0.2);width:82%">
+      <span>✅ Creado SAP</span><span class="fn-val" style="color:#1cb87e">${creados}</span>
+    </div>
+    ${rechazados>0?`<div class="fn-arrow">▼ rechazos</div>
+    <div class="fn-step" style="background:#fdf0f0;border:1px solid rgba(232,67,67,.2);width:62%">
+      <span>❌ Rechazado</span><span class="fn-val" style="color:#e84343">${rechazados}</span>
+    </div>`:''}
+    <div class="fn-conv">Conversión: <strong style="color:#1cb87e">${tasa}%</strong> | Fuga: <strong style="color:#e84343">${100-tasa}%</strong></div>
+  `;
+}
+
+function buildSemaforo(filtered) {
+  const total=filtered.length;
+  const creados=filtered.filter(d=>d.estado==='CREADO EN SAP').length;
+  const tasa=total?Math.round(creados/total*100):0;
+  const tiempos=filtered.filter(d=>d.dias!==null).map(d=>d.dias);
+  const prom=tiempos.length?(tiempos.reduce((a,b)=>a+b,0)/tiempos.length).toFixed(1):null;
+  const mejora=prom?Math.round((11-prom)/11*100):null;
+
+  const slas=[
+    { lbl:'Tiempo creación', hint:prom?`${prom}d · SLA ≤5d`:'Sin datos', val:prom?`${prom}d`:'—',
+      cls: prom?( prom<=5?'s-g':prom<=8?'s-y':'s-r'):'s-y',
+      badge: prom?(prom<=5?'🟢 OK':prom<=8?'🟡 ⚠':'🔴 Alto'):'—' },
+    { lbl:'Tasa de creación', hint:`${tasa}% · Meta: 95%`, val:`${tasa}%`,
+      cls: tasa>=90?'s-g':tasa>=75?'s-y':'s-r',
+      badge: tasa>=90?'🟢 OK':tasa>=75?'🟡 ⚠':'🔴 Bajo' },
+    { lbl:'Mejora vs manual', hint:'vs 11 días proceso anterior', val: mejora?`${mejora}%`:'—',
+      cls: mejora&&mejora>=50?'s-g': mejora&&mejora>=20?'s-y':'s-r',
+      badge: mejora?`${mejora}% mejor`:'—' },
+    { lbl:'Pendientes críticos', hint:'En gestión o escalados',
+      val:`${filtered.filter(d=>d.sla==='bad').length}`,
+      cls: filtered.filter(d=>d.sla==='bad').length===0?'s-g': filtered.filter(d=>d.sla==='bad').length<=2?'s-y':'s-r',
+      badge: filtered.filter(d=>d.sla==='bad').length===0?'🟢 OK':'🔴 Alerta' },
+  ];
+
+  const el=document.getElementById('semList');
+  el.innerHTML=slas.map(s=>`
+    <div class="sem-row ${s.cls}">
+      <div class="sem-left">
+        <div class="sem-dot"></div>
+        <div><div class="sem-name">${s.lbl}</div><div class="sem-hint">${s.hint}</div></div>
+      </div>
+      <div class="sem-badge">${s.badge}</div>
+    </div>
+  `).join('');
+}
+
+function buildKPIs(filtered) {
+  const total=filtered.length;
+  const creados=filtered.filter(d=>d.estado==='CREADO EN SAP').length;
+  const tasa=total?((creados/total)*100).toFixed(1):0;
+  const tiempos=filtered.filter(d=>d.dias!==null).map(d=>d.dias);
+  const prom=tiempos.length?(tiempos.reduce((a,b)=>a+b,0)/tiempos.length).toFixed(1):'—';
+  const pend=total-creados;
+  const analistas=new Set(filtered.map(d=>d.analista)).size;
+
+  document.getElementById('kTotal').textContent=total;
+  document.getElementById('kTotalSub').textContent=`${analistas} analistas activos`;
+  document.getElementById('kCreados').textContent=creados;
+  document.getElementById('kCreadosSub').textContent=`de ${total} radicados`;
+  document.getElementById('kTasa').textContent=`${tasa}%`;
+  const tasaNum=parseFloat(tasa);
+  const tBadge=document.getElementById('kTasaSub');
+  tBadge.textContent= tasaNum>=90?'✅ Meta alcanzada': tasaNum>=75?'⚠ Cerca de meta':'🔴 Bajo meta';
+  tBadge.className='kpi-badge '+(tasaNum>=90?'b-up':tasaNum>=75?'b-war':'b-dn');
+  document.getElementById('kTiempo').textContent=prom!=='—'?`${prom}d`:'—';
+  document.getElementById('kTiempoSub').textContent= prom!=='—'&&parseFloat(prom)<=5?'✅ Dentro de SLA':'⚠ Revisar SLA';
+  document.getElementById('kPend').textContent=pend;
+  document.getElementById('kPendSub').textContent=pend===0?'✅ Todo creado':'Requieren gestión';
+  document.getElementById('kAnalistasSub').textContent=`de ${new Set(DATA.map(d=>d.analista)).size} en equipo`;
+  document.getElementById('kAnalistas').textContent=analistas;
+
+  // Comparison banner
+  if(prom!=='—'){
+    const p=parseFloat(prom);
+    const ahorro=(11-p).toFixed(1);
+    const mejora=Math.round((11-p)/11*100);
+    document.getElementById('cmpTiempo').textContent=`${p} días`;
+    document.getElementById('cmpAhorro').textContent=`${ahorro} días`;
+    document.getElementById('cmpMejora').textContent=`🏆 ${mejora}% más rápido`;
+  }
+}
+
+function buildCharts(filtered) {
+  // Monthly aggregation
+  const byMes={1:{rad:0,cre:0},2:{rad:0,cre:0},3:{rad:0,cre:0}};
+  filtered.forEach(d=>{
+    if(byMes[d.mes]){
+      byMes[d.mes].rad++;
+      if(d.estado==='CREADO EN SAP') byMes[d.mes].cre++;
+    }
+  });
+  const meses=[1,2,3];
+  const radVals=meses.map(m=>byMes[m].rad);
+  const creVals=meses.map(m=>byMes[m].cre);
+  const xs=[20,170,320];
+
+  function scaleY(val, max, minY=15, maxY=95){ return maxY - ((val/Math.max(max,1))*(maxY-minY)); }
+
+  // Radicados
+  const mxR=Math.max(...radVals,1);
+  const ptsR=xs.map((x,i)=>`${x},${scaleY(radVals[i],mxR)}`).join(' ');
+  const firstR=ptsR.split(' ')[0]; const lastR=ptsR.split(' ').slice(-1)[0];
+  const lx=parseFloat(lastR.split(',')[0]);
+  const ly=parseFloat(lastR.split(',')[1]);
+  document.getElementById('lineRad').setAttribute('points',ptsR);
+  document.getElementById('pathRad').setAttribute('d',`M${ptsR.replace(/ /g,' L')} L${lx},95 L20,95 Z`);
+  document.getElementById('dotRad').setAttribute('cx',lx);
+  document.getElementById('dotRad').setAttribute('cy',ly);
+
+  // Creaciones
+  const mxC=Math.max(...creVals,1);
+  const ptsC=xs.map((x,i)=>`${x},${scaleY(creVals[i],mxC)}`).join(' ');
+  const lastC=ptsC.split(' ').slice(-1)[0];
+  const lcx=parseFloat(lastC.split(',')[0]), lcy=parseFloat(lastC.split(',')[1]);
+  document.getElementById('lineCre').setAttribute('points',ptsC);
+  document.getElementById('pathCre').setAttribute('d',`M${ptsC.replace(/ /g,' L')} L${lcx},95 L20,95 Z`);
+  document.getElementById('dotCre').setAttribute('cx',lcx);
+  document.getElementById('dotCre').setAttribute('cy',lcy);
+}
+
+function buildTable(filtered) {
+  const tbody=document.getElementById('tblBody');
+  const noR=document.getElementById('noResults');
+  const lbl=document.getElementById('tblCountLbl');
+  tbody.innerHTML='';
+  lbl.textContent=`${filtered.length} registro${filtered.length!==1?'s':''} · Con indicadores de SLA`;
+  if(!filtered.length){ noR.style.display='block'; return; }
+  noR.style.display='none';
+  filtered.forEach((r,i)=>{
+    const [pillCls, pillIcon]=ESTADO_PILL[r.estado]||['p-fmt','📋'];
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td style="color:#8b93b0;font-size:11px">${r.idx}</td>
+      <td class="td-a">${shortA(r.analista)}</td>
+      <td class="td-f">${r.carpeta}</td>
+      <td><span class="pill ${pillCls}"><span class="dot2"></span>${pillIcon} ${r.estado}</span></td>
+      <td class="td-dt">${fmtDate(r.reg)}</td>
+      <td class="td-dt">${fmtDate(r.cre)}</td>
+      <td style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:#4a5270">${r.dias!==null?r.dias+'d':'—'}</td>
+      <td>${slaHtml(r)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function buildInsights(filtered) {
+  const total=filtered.length;
+  const creados=filtered.filter(d=>d.estado==='CREADO EN SAP').length;
+  const tasa=total?((creados/total)*100).toFixed(1):0;
+  const tiempos=filtered.filter(d=>d.dias!==null).map(d=>d.dias);
+  const prom=tiempos.length?(tiempos.reduce((a,b)=>a+b,0)/tiempos.length).toFixed(1):null;
+
+  // Analista con mayor carga
+  const byCounts={};
+  filtered.forEach(d=>{ byCounts[d.analista]=(byCounts[d.analista]||0)+1; });
+  const sorted=Object.entries(byCounts).sort((a,b)=>b[1]-a[1]);
+  const topA=sorted[0];
+
+  // Analista más rápido
+  const byDays={}, byCnt={};
+  filtered.forEach(d=>{ if(d.dias!==null){ byDays[d.analista]=(byDays[d.analista]||0)+d.dias; byCnt[d.analista]=(byCnt[d.analista]||0)+1; }});
+  const promByA=Object.entries(byCnt).map(([a,c])=>([a,(byDays[a]/c).toFixed(1)])).sort((a,b)=>a[1]-b[1]);
+  const fastA=promByA[0];
+
+  const vencidos=filtered.filter(d=>d.sla==='bad');
+  const mejora=prom?Math.round((11-prom)/11*100):null;
+
+  const insights=[
+    {
+      icon:'🏆', bg:'#e7f9f2', col:'#1cb87e',
+      title:`Eficiencia de Automatización: ${mejora?mejora+'%':'—'} de mejora`,
+      text: prom
+        ? `De 11 días manuales a ${prom} días con SAP. Ahorro de ${(11-prom).toFixed(1)} días por proveedor. Con ${creados} creaciones, se evitaron ~${Math.round(creados*(11-prom))} días acumulados de espera.`
+        : 'Sin datos suficientes para calcular en el filtro actual.'
+    },
+    {
+      icon: topA&&(topA[1]/total)>=0.4?'⚠️':'👥',
+      bg: topA&&(topA[1]/total)>=0.4?'#fdf0f0':'#eef1fd',
+      col: topA&&(topA[1]/total)>=0.4?'#e84343':'#3a56e8',
+      title: topA
+        ? `Analista con mayor carga: ${shortA(topA[0])} (${Math.round(topA[1]/total*100)}%)`
+        : 'Sin datos de analistas',
+      text: topA
+        ? `${shortA(topA[0])} gestiona ${topA[1]} de ${total} casos. ${topA[1]/total>=0.5?'Concentración crítica — redistribución recomendada para reducir riesgo operativo.':'Distribución moderada.'} Tiempo prom: ${byDays[topA[0]]&&byCnt[topA[0]]?(byDays[topA[0]]/byCnt[topA[0]]).toFixed(1)+'d':' —'}.`
+        : ''
+    },
+    {
+      icon: vencidos.length===0?'✅':'🔴',
+      bg: vencidos.length===0?'#e7f9f2':'#fdf0f0',
+      col: vencidos.length===0?'#1cb87e':'#e84343',
+      title: vencidos.length===0
+        ? 'Todos los casos dentro de SLA ≤5 días'
+        : `${vencidos.length} caso(s) superan SLA · Acción requerida`,
+      text: vencidos.length===0
+        ? `Tasa de creación ${tasa}% · ${parseFloat(tasa)>=95?'Meta alcanzada ✅':'Gestionar los '+pend+' pendientes para alcanzar meta del 95%.'}`
+        : `Casos vencidos: ${vencidos.map(d=>shortA(d.analista)+': '+d.carpeta.split('-')[0]).slice(0,3).join(', ')}${vencidos.length>3?'...':'.'}  Escalar o reasignar con urgencia.`
+    },
+  ];
+
+  const pend=total-creados;
+  document.getElementById('insightsGrid').innerHTML=insights.map(ins=>`
+    <div class="ins-card">
+      <div class="ins-icon" style="background:${ins.bg}">${ins.icon}</div>
+      <div>
+        <h4 style="color:${ins.col}">${ins.title}</h4>
+        <p>${ins.text}</p>
+      </div>
+    </div>
+  `).join('');
+}
+
+function applyFilters() {
+  const f=getFiltered();
+  buildKPIs(f);
+  buildCharts(f);
+  buildSemaforo(f);
+  buildBars(f);
+  buildDonut(f);
+  buildFunnel(f);
+  buildTable(f);
+  buildInsights(f);
+}
+
+function resetFilters() {
+  document.getElementById('fMes').value='';
+  document.getElementById('fAnalista').value='';
+  document.getElementById('fEstado').value='';
+  document.getElementById('fSla').value='';
+  document.getElementById('searchInput').value='';
+  applyFilters();
+}
+
+// INIT
+populateFilters();
+applyFilters();
+</script>
+</body>
+</html>
