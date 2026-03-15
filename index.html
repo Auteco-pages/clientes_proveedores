@@ -221,12 +221,6 @@ tbody td{padding:10px 10px;font-size:12px;vertical-align:middle;}
           <span class="filter-label">Mes</span>
           <select class="filter-select" id="fMes" onchange="applyFilters()">
             <option value="">Todos</option>
-            <option value="1">Enero</option>
-            <option value="2">Febrero</option>
-            <option value="3">Marzo</option>
-            <option value="4">Abril</option>
-            <option value="5">Mayo</option>
-            <option value="6">Junio</option>
           </select>
         </div>
         <div class="divider"></div>
@@ -469,7 +463,20 @@ function loadFallback() {
   DATA = [
   {idx:1,analista:'arios@auteco.com',carpeta:'REPRESENTACIONES DAGLO S.A.S.-1',estado:'CREADO EN SAP',reg:new Date('2026-01-26'),cre:new Date('2026-01-27'),mes:1,diasStr:'1d',diasNum:1,slaStr:'✓ 1d',slaType:'ok'},
   {idx:2,analista:'tytaborda@auteco.com',carpeta:'PROYECTOS SANTA CRUZ SAS-2',estado:'CREADO EN SAP',reg:new Date('2026-01-26'),cre:new Date('2026-01-27'),mes:1,diasStr:'1d',diasNum:1,slaStr:'✓ 1d',slaType:'ok'},
- ];
+  {idx:3,analista:'etabares@auteco.com',carpeta:'AXITY COLOMBIA SAS-3',estado:'CREADO EN SAP',reg:new Date('2026-01-28'),cre:new Date('2026-02-04'),mes:1,diasStr:'7d',diasNum:7,slaStr:'▲ 7d',slaType:'warn'},
+  {idx:4,analista:'arios@auteco.com',carpeta:'Juan Manuel Quijano-4',estado:'CREADO EN SAP',reg:new Date('2026-01-28'),cre:new Date('2026-01-30'),mes:1,diasStr:'2d',diasNum:2,slaStr:'✓ 2d',slaType:'ok'},
+  {idx:5,analista:'aurrego@auteco.com',carpeta:'Jonathan Uribe Mendoza-5',estado:'CREADO EN SAP',reg:new Date('2026-01-29'),cre:new Date('2026-01-30'),mes:1,diasStr:'1d',diasNum:1,slaStr:'✓ 1d',slaType:'ok'},
+  {idx:7,analista:'tytaborda@auteco.com',carpeta:'J.A.R. PROYECTOS CIVILES S.A.S.-7',estado:'CREADO EN SAP',reg:new Date('2026-01-29'),cre:new Date('2026-02-02'),mes:1,diasStr:'4d',diasNum:4,slaStr:'✓ 4d',slaType:'ok'},
+  {idx:8,analista:'tytaborda@auteco.com',carpeta:'AKTIV GESTION DE ACTIVOS S A S-8',estado:'CREADO EN SAP',reg:new Date('2026-01-29'),cre:new Date('2026-02-03'),mes:1,diasStr:'5d',diasNum:5,slaStr:'✓ 5d',slaType:'ok'},
+  {idx:9,analista:'arios@auteco.com',carpeta:'Carlos Alberto Vanegas-9',estado:'CREADO EN SAP',reg:new Date('2026-01-30'),cre:new Date('2026-02-05'),mes:1,diasStr:'6d',diasNum:6,slaStr:'▲ 6d',slaType:'warn'},
+  {idx:10,analista:'aurrego@auteco.com',carpeta:'INVERSIONES LOGUZ SAS-10',estado:'CREADO EN SAP',reg:new Date('2026-01-31'),cre:new Date('2026-02-05'),mes:1,diasStr:'5d',diasNum:5,slaStr:'✓ 5d',slaType:'ok'},
+  {idx:11,analista:'aurrego@auteco.com',carpeta:'María Camila Delgado Calderon-11',estado:'RECHAZADO CUMPLIMIENTO',reg:new Date('2026-02-02'),cre:null,mes:2,diasStr:'—',diasNum:null,slaStr:'✕ Cancelado',slaType:'cancel'},
+  {idx:28,analista:'etabares@auteco.com',carpeta:'GREEN LOOP SUSTAINABLE ARCHITECTURE AND ENGINEERING LTDA-28',estado:'CREADO EN SAP',reg:new Date('2026-02-10'),cre:new Date('2026-02-19'),mes:2,diasStr:'9d',diasNum:9,slaStr:'✕ 9d',slaType:'bad'},
+  {idx:33,analista:'arios@auteco.com',carpeta:'AUTONIZA S A-33',estado:'FORMATO DE VINCULACIÓN DILIGENCIADO',reg:new Date('2026-02-17'),cre:null,mes:2,diasStr:'—',diasNum:null,slaStr:'⏳ En Proceso',slaType:'proc'},
+  {idx:51,analista:'jtrujillo@auteco.com',carpeta:'ANAVA FZ SERVICES S.A.S.-51',estado:'CREADO EN SAP',reg:new Date('2026-03-02'),cre:new Date('2026-03-12'),mes:3,diasStr:'10d',diasNum:10,slaStr:'✕ 10d',slaType:'bad'},
+  {idx:52,analista:'jtrujillo@auteco.com',carpeta:'RJM GROUP S.A.S.-52',estado:'RECHAZADO ANALISTA',reg:new Date('2026-03-02'),cre:null,mes:3,diasStr:'—',diasNum:null,slaStr:'✕ Cancelado',slaType:'cancel'},
+  {idx:62,analista:'aurrego@auteco.com',carpeta:'CORPORACION CANTOALEGRE-62',estado:'ESCALADO A DATA MAESTRA',reg:new Date('2026-03-12'),cre:null,mes:3,diasStr:'—',diasNum:null,slaStr:'Pendiente',slaType:'pend'}
+  ];
   document.getElementById('badgeCorte').textContent = '📅 Datos de respaldo';
   populateFilters();
   applyFilters();
@@ -516,17 +523,25 @@ var ESTADO_COLORS = {
 var BAR_COLORS = ['#3a56e8','#00b899','#f5a623','#7c5cbf','#e84343','#1cb87e','#d4762a','#5aabff'];
 
 function populateFilters() {
-  var analistas = [], estados = [], seen = {a:{}, e:{}};
+  var MONTH_NAMES = ['','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  var meses = [], analistas = [], estados = [], seenM = {}, seenA = {}, seenE = {};
   DATA.forEach(function(d) {
-    if (!seen.a[d.analista]) { seen.a[d.analista]=1; analistas.push(d.analista); }
-    if (!seen.e[d.estado])   { seen.e[d.estado]=1;   estados.push(d.estado); }
+    if (!seenM[d.mes]) { seenM[d.mes]=1; meses.push(d.mes); }
+    if (!seenA[d.analista]) { seenA[d.analista]=1; analistas.push(d.analista); }
+    if (!seenE[d.estado])   { seenE[d.estado]=1;   estados.push(d.estado); }
   });
+  meses.sort(function(a,b){return a-b;});
   analistas.sort(); estados.sort();
-  var fA = document.getElementById('fAnalista'), fE = document.getElementById('fEstado');
+
+  var fM = document.getElementById('fMes');
+  var fA = document.getElementById('fAnalista');
+  var fE = document.getElementById('fEstado');
+  fM.innerHTML = '<option value="">Todos</option>';
   fA.innerHTML = '<option value="">Todos</option>';
   fE.innerHTML = '<option value="">Todos</option>';
-  analistas.forEach(function(a) { fA.innerHTML += '<option value="'+a+'">'+a+'</option>'; });
-  estados.forEach(function(e)   { fE.innerHTML += '<option value="'+e+'">'+e+'</option>'; });
+  meses.forEach(function(m)   { fM.innerHTML += '<option value="'+m+'">'+MONTH_NAMES[m]+'</option>'; });
+  analistas.forEach(function(a){ fA.innerHTML += '<option value="'+a+'">'+a+'</option>'; });
+  estados.forEach(function(e)  { fE.innerHTML += '<option value="'+e+'">'+e+'</option>'; });
 }
 
 function buildLineChart(svgId, data, color, gradId) {
