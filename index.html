@@ -235,6 +235,11 @@ tbody td{padding:10px 10px;font-size:12px;vertical-align:middle;}
         </div>
         <div class="divider"></div>
         <div class="filter-group">
+          <span class="filter-label">Contraparte</span>
+          <select class="filter-select" id="fContraparte" onchange="applyFilters()"><option value="">Todos</option></select>
+        </div>
+        <div class="divider"></div>
+        <div class="filter-group">
           <span class="filter-label">SLA</span>
           <select class="filter-select" id="fSla" onchange="applyFilters()">
             <option value="">Todos</option>
@@ -422,6 +427,7 @@ function loadData() {
           reg:       reg,
           cre:       r.FechaCreacion ? new Date(r.FechaCreacion) : null,
           mes:       reg.getMonth() + 1,
+          contraparte: (r.Contraparte || '').trim(),
           diasStr:   sla.diasStr,
           diasNum:   sla.dias,
           slaStr:    sla.slaStr,
@@ -461,7 +467,7 @@ function setStatus(state, msg) {
 // Fallback con datos hardcoded si no hay conexión
 function loadFallback() {
   DATA = [
-  {idx:1,analista:'arios@auteco.com',carpeta:'REPRESENTACIONES DAGLO S.A.S.-1',estado:'CREADO EN SAP',reg:new Date('2026-01-26'),cre:new Date('2026-01-27'),mes:1,diasStr:'1d',diasNum:1,slaStr:'✓ 1d',slaType:'ok'},
+  {idx:1,contraparte:'Proveedor',analista:'arios@auteco.com',carpeta:'REPRESENTACIONES DAGLO S.A.S.-1',estado:'CREADO EN SAP',reg:new Date('2026-01-26'),cre:new Date('2026-01-27'),mes:1,diasStr:'1d',diasNum:1,slaStr:'✓ 1d',slaType:'ok'},
   {idx:2,analista:'tytaborda@auteco.com',carpeta:'PROYECTOS SANTA CRUZ SAS-2',estado:'CREADO EN SAP',reg:new Date('2026-01-26'),cre:new Date('2026-01-27'),mes:1,diasStr:'1d',diasNum:1,slaStr:'✓ 1d',slaType:'ok'},
   {idx:3,analista:'etabares@auteco.com',carpeta:'AXITY COLOMBIA SAS-3',estado:'CREADO EN SAP',reg:new Date('2026-01-28'),cre:new Date('2026-02-04'),mes:1,diasStr:'7d',diasNum:7,slaStr:'▲ 7d',slaType:'warn'},
   {idx:4,analista:'arios@auteco.com',carpeta:'Juan Manuel Quijano-4',estado:'CREADO EN SAP',reg:new Date('2026-01-28'),cre:new Date('2026-01-30'),mes:1,diasStr:'2d',diasNum:2,slaStr:'✓ 2d',slaType:'ok'},
@@ -483,17 +489,19 @@ function loadFallback() {
 }
 
 function getFiltered() {
-  var mes = document.getElementById('fMes').value;
-  var analista = document.getElementById('fAnalista').value;
-  var estado = document.getElementById('fEstado').value;
-  var sla = document.getElementById('fSla').value;
-  var search = document.getElementById('searchInput').value.toLowerCase().trim();
+  var mes         = document.getElementById('fMes').value;
+  var analista    = document.getElementById('fAnalista').value;
+  var estado      = document.getElementById('fEstado').value;
+  var contraparte = document.getElementById('fContraparte').value;
+  var sla         = document.getElementById('fSla').value;
+  var search      = document.getElementById('searchInput').value.toLowerCase().trim();
   return DATA.filter(function(d) {
-    if (mes && d.mes !== parseInt(mes)) return false;
-    if (analista && d.analista !== analista) return false;
-    if (estado && d.estado !== estado) return false;
-    if (sla && d.slaType !== sla) return false;
-    if (search && (d.analista + ' ' + d.carpeta + ' ' + d.estado).toLowerCase().indexOf(search) === -1) return false;
+    if (mes         && d.mes !== parseInt(mes))     return false;
+    if (analista    && d.analista !== analista)      return false;
+    if (estado      && d.estado !== estado)          return false;
+    if (contraparte && d.contraparte !== contraparte) return false;
+    if (sla         && d.slaType !== sla)            return false;
+    if (search && (d.analista+' '+d.carpeta+' '+d.estado+' '+d.contraparte).toLowerCase().indexOf(search) === -1) return false;
     return true;
   });
 }
@@ -524,24 +532,29 @@ var BAR_COLORS = ['#3a56e8','#00b899','#f5a623','#7c5cbf','#e84343','#1cb87e','#
 
 function populateFilters() {
   var MONTH_NAMES = ['','Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-  var meses = [], analistas = [], estados = [], seenM = {}, seenA = {}, seenE = {};
+  var meses = [], analistas = [], estados = [], contrapartes = [];
+  var seenM = {}, seenA = {}, seenE = {}, seenC = {};
   DATA.forEach(function(d) {
     if (!seenM[d.mes]) { seenM[d.mes]=1; meses.push(d.mes); }
     if (!seenA[d.analista]) { seenA[d.analista]=1; analistas.push(d.analista); }
     if (!seenE[d.estado])   { seenE[d.estado]=1;   estados.push(d.estado); }
+    if (d.contraparte && !seenC[d.contraparte]) { seenC[d.contraparte]=1; contrapartes.push(d.contraparte); }
   });
   meses.sort(function(a,b){return a-b;});
-  analistas.sort(); estados.sort();
+  analistas.sort(); estados.sort(); contrapartes.sort();
 
-  var fM = document.getElementById('fMes');
-  var fA = document.getElementById('fAnalista');
-  var fE = document.getElementById('fEstado');
+  var fM  = document.getElementById('fMes');
+  var fA  = document.getElementById('fAnalista');
+  var fE  = document.getElementById('fEstado');
+  var fC  = document.getElementById('fContraparte');
   fM.innerHTML = '<option value="">Todos</option>';
   fA.innerHTML = '<option value="">Todos</option>';
   fE.innerHTML = '<option value="">Todos</option>';
-  meses.forEach(function(m)   { fM.innerHTML += '<option value="'+m+'">'+MONTH_NAMES[m]+'</option>'; });
-  analistas.forEach(function(a){ fA.innerHTML += '<option value="'+a+'">'+a+'</option>'; });
-  estados.forEach(function(e)  { fE.innerHTML += '<option value="'+e+'">'+e+'</option>'; });
+  fC.innerHTML = '<option value="">Todos</option>';
+  meses.forEach(function(m)        { fM.innerHTML += '<option value="'+m+'">'+MONTH_NAMES[m]+'</option>'; });
+  analistas.forEach(function(a)    { fA.innerHTML += '<option value="'+a+'">'+a+'</option>'; });
+  estados.forEach(function(e)      { fE.innerHTML += '<option value="'+e+'">'+e+'</option>'; });
+  contrapartes.forEach(function(c) { fC.innerHTML += '<option value="'+c+'">'+c+'</option>'; });
 }
 
 function buildLineChart(svgId, data, color, gradId) {
@@ -822,7 +835,7 @@ function applyFilters() {
 }
 
 function resetFilters() {
-  ['fMes','fAnalista','fEstado','fSla'].forEach(function(id){ document.getElementById(id).value=''; });
+  ['fMes','fAnalista','fEstado','fContraparte','fSla'].forEach(function(id){ document.getElementById(id).value=''; });
   document.getElementById('searchInput').value='';
   applyFilters();
 }
